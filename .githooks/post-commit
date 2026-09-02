@@ -1,0 +1,4 @@
+#!/bin/sh
+# Push the current branch after each successful local commit. A configured remote
+# and valid GitHub credentials are required; failure does not undo the commit.
+git push origin HEAD >/dev/null 2>&1 || true

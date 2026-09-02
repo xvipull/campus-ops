@@ -1,0 +1,15 @@
+# Sensitive source data and generated BI artifacts
+data/raw/*
+!data/raw/.gitkeep
+data/staging/*
+!data/staging/.gitkeep
+*.pbix
+*.xlsx
+*.xlsm
+.env
+.DS_Store
+
+# Notebook checkpoints and Python output
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
