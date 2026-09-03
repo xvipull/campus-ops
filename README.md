@@ -51,6 +51,7 @@ Admissions / SIS / LMS / Finance / HR
 - [KPI catalog](docs/kpi_catalog.md)
 - [Data dictionary](docs/data_dictionary.md)
 - [Assumptions and risks](docs/assumptions.md)
+- [Pipeline, controls, and star model](docs/data_pipeline.md)
 
 ## Report screenshots
 

@@ -1,0 +1,4 @@
+term_code,org_code,scenario_version,enrollment_forecast,net_tuition_amount,available_sch_forecast,source_updated_at
+fall26,cs,approved v1,140,"1,120,000",2100,2026-09-01
+fall26,bio,APPROVED V1,120,960000,1800,2026-09-01
+fall26,bus,APPROVED V1,110,"880,000",1650,2026-09-01

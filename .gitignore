@@ -1,8 +1,10 @@
 # Sensitive source data and generated BI artifacts
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/*.csv
 data/staging/*
 !data/staging/.gitkeep
+!data/staging/*.csv
 *.pbix
 *.xlsx
 *.xlsm

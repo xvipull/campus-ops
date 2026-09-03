@@ -1,0 +1,5 @@
+student_id,term_code,org_code,enrollment_status,registered_credit_hours,snapshot_date,source_updated_at
+S-1001,FALL26,CS,active,15,09/07/2026,2026-09-01
+S-1002,fall26,bio,ACTIVE,12,2026-09-07,2026-09-01
+S-1003, FALL26 ,CS,active,9,2026-09-07,2026-09-01
+S-1004,FALL26,BUS,withdrawn,3,2026-09-07,2026-09-01

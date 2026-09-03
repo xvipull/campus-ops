@@ -1,0 +1,5 @@
+student_key,term_code,org_code,enrollment_status,registered_credit_hours,snapshot_date,source_updated_at
+STU-1ed17bf3d4e8353d,FALL26,CS,Active,15.0,2026-09-07,2026-09-01
+STU-cb2bc62a772a2544,FALL26,BIO,Active,12.0,2026-09-07,2026-09-01
+STU-af27fdd935de0143,FALL26,CS,Active,9.0,2026-09-07,2026-09-01
+STU-495734c74095a53c,FALL26,BUS,Withdrawn,3.0,2026-09-07,2026-09-01

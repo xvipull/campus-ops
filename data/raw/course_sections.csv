@@ -1,0 +1,4 @@
+section_id,term_code,org_code,subject_code,modality,available_seats,enrolled_seats,snapshot_date,source_updated_at
+cs101-01,FALL26,CS,cs101,in person,30,28,2026-09-07,2026-09-01
+bio110-01,fall26,BIO,BIO110,ONLINE,40,35,09/07/2026,2026-09-01
+bus200-01,FALL26,bus,bus200,Hybrid,25,22,2026-09-07,2026-09-01
