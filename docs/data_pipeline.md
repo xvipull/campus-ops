@@ -9,6 +9,7 @@ The repository uses a compact **synthetic university operations dataset** that m
 ```bash
 python3 src/run_pipeline.py
 python3 -m unittest discover -s tests -v
+python3 notebooks/eda.py
 ```
 
 The pipeline preserves `data/raw/*.csv` unchanged; standardizes into `data/staging/*.csv`; replaces the reproducible SQLite database `data/campus_ops.db`; and regenerates `reports/data_quality.md`.
@@ -31,3 +32,5 @@ The pipeline fails before database load if any source has missing columns, nulls
 ## Star model
 
 `fact_enrollment`, `fact_course_section`, and `fact_plan` join through conformed `dim_term` and `dim_academic_org`; enrollment also joins `dim_student`. Schema DDL declares foreign keys, unique business grains, and integer surrogate keys. See `sql/star_schema.sql` for executable definitions.
+
+`sql/kpi_views.sql` adds reusable enrollment, capacity, planning, segment, cohort-persistence, trend/window-function, and reconciliation views. `sql/exception_tables.sql` materializes operational exceptions at each database load. Reconciliation control totals are captured during ingestion and must match curated and reporting views within the documented tolerance (0 rows / seats, 0.01 credit hours).

@@ -33,3 +33,8 @@ CREATE TABLE fact_plan (
   enrollment_forecast INTEGER NOT NULL, net_tuition_amount REAL NOT NULL, available_sch_forecast REAL NOT NULL,
   UNIQUE(term_key,org_key,scenario_version), FOREIGN KEY(term_key) REFERENCES dim_term(term_key), FOREIGN KEY(org_key) REFERENCES dim_academic_org(org_key)
 );
+-- Control totals captured at ingest for SQL reconciliation; one row per metric.
+CREATE TABLE control_source_totals (
+  metric_name TEXT PRIMARY KEY, source_value REAL NOT NULL, tolerance REAL NOT NULL,
+  source_snapshot_date TEXT NOT NULL
+);

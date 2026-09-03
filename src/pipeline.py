@@ -152,6 +152,14 @@ def build_database(stage: dict[str, list[dict]]) -> None:
     connection.executemany("INSERT INTO fact_enrollment (student_key,term_key,org_key,enrollment_status,registered_credit_hours,snapshot_date) VALUES (?,?,?,?,?,?)", [(ids["dim_student"][r["student_key"]], ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["enrollment_status"], r["registered_credit_hours"], r["snapshot_date"]) for r in stage["enrollment"]])
     connection.executemany("INSERT INTO fact_course_section (section_business_key,term_key,org_key,subject_code,modality,available_seats,enrolled_seats,snapshot_date) VALUES (?,?,?,?,?,?,?,?)", [(r["section_id"], ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["subject_code"], r["modality"], r["available_seats"], r["enrolled_seats"], r["snapshot_date"]) for r in stage["course_sections"]])
     connection.executemany("INSERT INTO fact_plan (term_key,org_key,scenario_version,enrollment_forecast,net_tuition_amount,available_sch_forecast) VALUES (?,?,?,?,?,?)", [(ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["scenario_version"], r["enrollment_forecast"], r["net_tuition_amount"], r["available_sch_forecast"]) for r in stage["financial_plan"]])
+    active_enrollment = [r for r in stage["enrollment"] if r["enrollment_status"] == "Active"]
+    connection.executemany("INSERT INTO control_source_totals (metric_name,source_value,tolerance,source_snapshot_date) VALUES (?,?,?,?)", [
+        ("active_enrollment_rows", float(len(active_enrollment)), 0.0, max(r["source_updated_at"] for r in stage["enrollment"])),
+        ("active_credit_hours", sum(r["registered_credit_hours"] for r in active_enrollment), 0.01, max(r["source_updated_at"] for r in stage["enrollment"])),
+        ("enrolled_seats", float(sum(r["enrolled_seats"] for r in stage["course_sections"])), 0.0, max(r["source_updated_at"] for r in stage["course_sections"])),
+    ])
+    connection.executescript((ROOT / "sql" / "kpi_views.sql").read_text())
+    connection.executescript((ROOT / "sql" / "exception_tables.sql").read_text())
     connection.commit(); connection.close()
 
 

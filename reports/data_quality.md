@@ -10,19 +10,19 @@
 
 | Dataset | Raw rows | Clean rows | Result |
 | --- | ---: | ---: | --- |
-| terms | 2 | 2 | PASS — 1:1 retained |
+| terms | 4 | 4 | PASS — 1:1 retained |
 | academic_orgs | 3 | 3 | PASS — 1:1 retained |
-| students | 4 | 4 | PASS — 1:1 retained |
-| enrollment | 4 | 4 | PASS — 1:1 retained |
-| course_sections | 3 | 3 | PASS — 1:1 retained |
-| financial_plan | 3 | 3 | PASS — 1:1 retained |
+| students | 8 | 8 | PASS — 1:1 retained |
+| enrollment | 19 | 19 | PASS — 1:1 retained |
+| course_sections | 9 | 9 | PASS — 1:1 retained |
+| financial_plan | 9 | 9 | PASS — 1:1 retained |
 
 ## Value reconciliation
 
 | Measure | Clean total | Result |
 | --- | ---: | --- |
-| enrollment_registered_credit_hours | 39.00 | PASS |
-| financial_plan_net_tuition_amount | 2,960,000.00 | PASS |
+| enrollment_registered_credit_hours | 201.00 | PASS |
+| financial_plan_net_tuition_amount | 160,000.00 | PASS |
 
 ## Controls
 

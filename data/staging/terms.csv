@@ -1,3 +1,5 @@
 term_code,term_name,start_date,census_date,term_status,source_updated_at
+FALL25,Fall 2025,2025-08-25,2025-09-08,Closed,2026-09-01
+SPRING26,Spring 2026,2026-01-13,2026-01-27,Closed,2026-09-01
 FALL26,Fall 2026,2026-08-24,2026-09-07,Open,2026-09-01
 SPRING27,Spring 2027,2027-01-12,2027-01-26,Planning,2026-09-01
