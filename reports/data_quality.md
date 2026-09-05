@@ -1,6 +1,6 @@
 # Data Quality Report
 
-**Run date:** 2026-09-03
+**Run date:** 2026-09-05
 
 ## Result
 
@@ -16,6 +16,7 @@
 | enrollment | 19 | 19 | PASS — 1:1 retained |
 | course_sections | 9 | 9 | PASS — 1:1 retained |
 | financial_plan | 9 | 9 | PASS — 1:1 retained |
+| resource_scenarios | 6 | 6 | PASS — 1:1 retained |
 
 ## Value reconciliation
 
@@ -26,7 +27,7 @@
 
 ## Controls
 
-- Required columns: PASS for 6 source files.
+- Required columns: PASS for 7 source files.
 - Null threshold: PASS; maximum permitted rate is 0% for required cleaned fields.
 - Duplicate business keys: PASS.
 - Invalid ranges: PASS; non-negative credits, seats, forecasts, and currency; enrolled seats do not exceed capacity.

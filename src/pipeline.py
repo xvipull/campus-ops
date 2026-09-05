@@ -27,6 +27,7 @@ REQUIRED = {
     "enrollment.csv": ["student_id", "term_code", "org_code", "enrollment_status", "registered_credit_hours", "snapshot_date", "source_updated_at"],
     "course_sections.csv": ["section_id", "term_code", "org_code", "subject_code", "modality", "available_seats", "enrolled_seats", "snapshot_date", "source_updated_at"],
     "financial_plan.csv": ["term_code", "org_code", "scenario_version", "enrollment_forecast", "net_tuition_amount", "available_sch_forecast", "source_updated_at"],
+    "resource_scenarios.csv": ["term_code", "org_code", "scenario_name", "demand_growth_pct", "planned_sections", "faculty_fte", "sch_capacity_per_fte", "room_count", "room_slots_per_room", "room_seats", "source_updated_at"],
 }
 
 
@@ -110,6 +111,7 @@ def clean_sources() -> tuple[dict[str, list[dict]], dict[str, int], dict[str, fl
     stage["enrollment"] = [{"student_key": pseudonymize(text(r["student_id"]).upper()), "term_code": text(r["term_code"]).upper(), "org_code": text(r["org_code"]).upper(), "enrollment_status": category(r["enrollment_status"], {"ACTIVE": "Active", "WITHDRAWN": "Withdrawn"}, "enrollment_status"), "registered_credit_hours": decimal(r["registered_credit_hours"], "registered_credit_hours"), "snapshot_date": parse_date(r["snapshot_date"], "snapshot_date"), "source_updated_at": parse_date(r["source_updated_at"], "source_updated_at")} for r in raw["enrollment.csv"]]
     stage["course_sections"] = [{"section_id": text(r["section_id"]).upper(), "term_code": text(r["term_code"]).upper(), "org_code": text(r["org_code"]).upper(), "subject_code": text(r["subject_code"]).upper(), "modality": category(r["modality"], {"IN PERSON": "In Person", "ONLINE": "Online", "HYBRID": "Hybrid"}, "modality"), "available_seats": int(decimal(r["available_seats"], "available_seats")), "enrolled_seats": int(decimal(r["enrolled_seats"], "enrolled_seats")), "snapshot_date": parse_date(r["snapshot_date"], "snapshot_date"), "source_updated_at": parse_date(r["source_updated_at"], "source_updated_at")} for r in raw["course_sections.csv"]]
     stage["financial_plan"] = [{"term_code": text(r["term_code"]).upper(), "org_code": text(r["org_code"]).upper(), "scenario_version": text(r["scenario_version"]).upper(), "enrollment_forecast": int(decimal(r["enrollment_forecast"], "enrollment_forecast")), "net_tuition_amount": decimal(r["net_tuition_amount"], "net_tuition_amount"), "available_sch_forecast": decimal(r["available_sch_forecast"], "available_sch_forecast"), "source_updated_at": parse_date(r["source_updated_at"], "source_updated_at")} for r in raw["financial_plan.csv"]]
+    stage["resource_scenarios"] = [{"term_code": text(r["term_code"]).upper(), "org_code": text(r["org_code"]).upper(), "scenario_name": text(r["scenario_name"]).upper(), "demand_growth_pct": decimal(r["demand_growth_pct"], "demand_growth_pct"), "planned_sections": int(decimal(r["planned_sections"], "planned_sections", 1)), "faculty_fte": decimal(r["faculty_fte"], "faculty_fte", 0.01), "sch_capacity_per_fte": decimal(r["sch_capacity_per_fte"], "sch_capacity_per_fte", 0.01), "room_count": int(decimal(r["room_count"], "room_count", 1)), "room_slots_per_room": int(decimal(r["room_slots_per_room"], "room_slots_per_room", 1)), "room_seats": int(decimal(r["room_seats"], "room_seats", 1)), "source_updated_at": parse_date(r["source_updated_at"], "source_updated_at")} for r in raw["resource_scenarios.csv"]]
     for row in stage["course_sections"]:
         if row["enrolled_seats"] > row["available_seats"]:
             raise ValueError(f"course_sections: enrollment exceeds capacity for {row['section_id']}")
@@ -122,8 +124,9 @@ def clean_sources() -> tuple[dict[str, list[dict]], dict[str, int], dict[str, fl
     assert_no_duplicates(stage["enrollment"], ["student_key", "term_code", "org_code", "snapshot_date"], "enrollment")
     assert_no_duplicates(stage["course_sections"], ["section_id", "term_code"], "course_sections")
     assert_no_duplicates(stage["financial_plan"], ["term_code", "org_code", "scenario_version"], "financial_plan")
+    assert_no_duplicates(stage["resource_scenarios"], ["term_code", "org_code", "scenario_name"], "resource_scenarios")
     terms, orgs, students = ({r["term_code"] for r in stage["terms"]}, {r["org_code"] for r in stage["academic_orgs"]}, {r["student_key"] for r in stage["students"]})
-    for label in ("enrollment", "course_sections", "financial_plan"):
+    for label in ("enrollment", "course_sections", "financial_plan", "resource_scenarios"):
         for row in stage[label]:
             if row["term_code"] not in terms or row["org_code"] not in orgs:
                 raise ValueError(f"{label}: invalid term/org reference")
@@ -152,6 +155,7 @@ def build_database(stage: dict[str, list[dict]]) -> None:
     connection.executemany("INSERT INTO fact_enrollment (student_key,term_key,org_key,enrollment_status,registered_credit_hours,snapshot_date) VALUES (?,?,?,?,?,?)", [(ids["dim_student"][r["student_key"]], ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["enrollment_status"], r["registered_credit_hours"], r["snapshot_date"]) for r in stage["enrollment"]])
     connection.executemany("INSERT INTO fact_course_section (section_business_key,term_key,org_key,subject_code,modality,available_seats,enrolled_seats,snapshot_date) VALUES (?,?,?,?,?,?,?,?)", [(r["section_id"], ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["subject_code"], r["modality"], r["available_seats"], r["enrolled_seats"], r["snapshot_date"]) for r in stage["course_sections"]])
     connection.executemany("INSERT INTO fact_plan (term_key,org_key,scenario_version,enrollment_forecast,net_tuition_amount,available_sch_forecast) VALUES (?,?,?,?,?,?)", [(ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["scenario_version"], r["enrollment_forecast"], r["net_tuition_amount"], r["available_sch_forecast"]) for r in stage["financial_plan"]])
+    connection.executemany("INSERT INTO fact_resource_scenario (term_key,org_key,scenario_name,demand_growth_pct,planned_sections,faculty_fte,sch_capacity_per_fte,room_count,room_slots_per_room,room_seats) VALUES (?,?,?,?,?,?,?,?,?,?)", [(ids["dim_term"][r["term_code"]], ids["dim_academic_org"][r["org_code"]], r["scenario_name"], r["demand_growth_pct"], r["planned_sections"], r["faculty_fte"], r["sch_capacity_per_fte"], r["room_count"], r["room_slots_per_room"], r["room_seats"]) for r in stage["resource_scenarios"]])
     active_enrollment = [r for r in stage["enrollment"] if r["enrollment_status"] == "Active"]
     connection.executemany("INSERT INTO control_source_totals (metric_name,source_value,tolerance,source_snapshot_date) VALUES (?,?,?,?)", [
         ("active_enrollment_rows", float(len(active_enrollment)), 0.0, max(r["source_updated_at"] for r in stage["enrollment"])),
@@ -160,6 +164,8 @@ def build_database(stage: dict[str, list[dict]]) -> None:
     ])
     connection.executescript((ROOT / "sql" / "kpi_views.sql").read_text())
     connection.executescript((ROOT / "sql" / "exception_tables.sql").read_text())
+    connection.executescript((ROOT / "sql" / "advanced_decision_support.sql").read_text())
+    connection.execute("INSERT INTO fact_resource_pressure (scenario_key,baseline_enrollment,projected_enrollment,baseline_sch,projected_sch,required_sections,course_section_pressure,faculty_pressure,room_pressure,composite_pressure_score,pressure_rank) SELECT scenario_key,baseline_enrollment,projected_enrollment,baseline_sch,projected_sch,required_sections,course_section_pressure,faculty_pressure,room_pressure,composite_pressure_score,pressure_rank FROM vw_resource_pressure")
     connection.commit(); connection.close()
 
 
@@ -174,9 +180,20 @@ def write_report(stage: dict[str, list[dict]], raw_counts: dict[str, int], total
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def write_resource_pressure_report() -> None:
+    with sqlite3.connect(DATABASE) as connection:
+        rows = connection.execute("SELECT term_code, scenario_name, pressure_rank, org_code, projected_enrollment, required_sections, course_section_pressure, faculty_pressure, room_pressure, composite_pressure_score FROM vw_resource_pressure ORDER BY term_code, scenario_name, pressure_rank, org_code").fetchall()
+    lines = ["# Resource Pressure Scenarios", "", "Generated from governed scenario inputs. A pressure ratio above 1.00 indicates demand exceeds the planned capacity for that resource.", "", "| Term | Scenario | Rank | Department | Projected enrollment | Required sections | Course | Faculty | Room | Composite |", "| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
+    for row in rows:
+        term, scenario, rank, org, projected, sections, course, faculty, room, composite = row
+        lines.append(f"| {term} | {scenario} | {rank} | {org} | {projected:.2f} | {sections} | {course:.2f} | {faculty:.2f} | {room:.2f} | {composite:.2f} |")
+    (ROOT / "reports" / "resource_pressure.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def run() -> None:
     stage, raw_counts, totals = clean_sources()
     write_staging(stage); build_database(stage); write_report(stage, raw_counts, totals)
+    write_resource_pressure_report()
     print(json.dumps({"status": "PASS", "database": str(DATABASE), "report": str(REPORT)}, indent=2))
 
 

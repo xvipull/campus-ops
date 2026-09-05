@@ -29,3 +29,4 @@
 - Obtain documented retention/completion eligibility rules and historical backfill period.
 - Approve budget allocation grain for college/program analysis.
 - Establish report release calendar around registration, census, and monthly financial close.
+- Validate faculty SCH/FTE capacity, room-slot availability, and organization-level scenario growth inputs before resource-planning publication.

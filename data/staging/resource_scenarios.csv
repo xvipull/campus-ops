@@ -1,0 +1,7 @@
+term_code,org_code,scenario_name,demand_growth_pct,planned_sections,faculty_fte,sch_capacity_per_fte,room_count,room_slots_per_room,room_seats,source_updated_at
+FALL26,CS,BASELINE,0.0,2,0.5,18.0,1,3,30,2026-09-01
+FALL26,BIO,BASELINE,0.0,2,1.5,18.0,1,3,40,2026-09-01
+FALL26,BUS,BASELINE,0.0,2,0.5,18.0,1,2,25,2026-09-01
+FALL26,CS,GROWTH_10,0.1,2,0.5,18.0,1,3,30,2026-09-01
+FALL26,BIO,GROWTH_10,0.1,2,1.5,18.0,1,3,40,2026-09-01
+FALL26,BUS,GROWTH_10,0.1,2,0.5,18.0,1,2,25,2026-09-01

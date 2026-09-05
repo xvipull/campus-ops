@@ -16,6 +16,10 @@ class AnalyticsModelTests(unittest.TestCase):
             self.assertEqual((passed, total), (3, 3))
             self.assertGreater(connection.execute("SELECT COUNT(*) FROM vw_kpi_enrollment_trend").fetchone()[0], 0)
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM exception_over_capacity").fetchone()[0], 0)
+            pressure_rows, baseline_rows = connection.execute("SELECT COUNT(*), SUM(scenario_name = 'BASELINE') FROM vw_resource_pressure").fetchone()
+            self.assertEqual((pressure_rows, baseline_rows), (6, 3))
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM fact_resource_pressure WHERE composite_pressure_score > 1").fetchone()[0], 2)
+            self.assertEqual(connection.execute("SELECT MIN(pressure_rank) FROM fact_resource_pressure").fetchone()[0], 1)
 
 
 if __name__ == "__main__":

@@ -38,3 +38,21 @@ CREATE TABLE control_source_totals (
   metric_name TEXT PRIMARY KEY, source_value REAL NOT NULL, tolerance REAL NOT NULL,
   source_snapshot_date TEXT NOT NULL
 );
+-- Governed scenario inputs; grain: term, academic organization, named scenario.
+CREATE TABLE fact_resource_scenario (
+  scenario_key INTEGER PRIMARY KEY, term_key INTEGER NOT NULL, org_key INTEGER NOT NULL,
+  scenario_name TEXT NOT NULL, demand_growth_pct REAL NOT NULL, planned_sections INTEGER NOT NULL,
+  faculty_fte REAL NOT NULL, sch_capacity_per_fte REAL NOT NULL, room_count INTEGER NOT NULL,
+  room_slots_per_room INTEGER NOT NULL, room_seats INTEGER NOT NULL,
+  UNIQUE(term_key, org_key, scenario_name),
+  FOREIGN KEY(term_key) REFERENCES dim_term(term_key), FOREIGN KEY(org_key) REFERENCES dim_academic_org(org_key)
+);
+-- Persisted decision-support output; calculations remain reproducible in vw_resource_pressure.
+CREATE TABLE fact_resource_pressure (
+  resource_pressure_key INTEGER PRIMARY KEY, scenario_key INTEGER NOT NULL UNIQUE,
+  baseline_enrollment REAL NOT NULL, projected_enrollment REAL NOT NULL, baseline_sch REAL NOT NULL,
+  projected_sch REAL NOT NULL, required_sections INTEGER NOT NULL, course_section_pressure REAL NOT NULL,
+  faculty_pressure REAL NOT NULL, room_pressure REAL NOT NULL, composite_pressure_score REAL NOT NULL,
+  pressure_rank INTEGER NOT NULL,
+  FOREIGN KEY(scenario_key) REFERENCES fact_resource_scenario(scenario_key)
+);
