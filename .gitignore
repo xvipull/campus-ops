@@ -8,6 +8,7 @@ data/staging/*
 *.pbix
 *.xlsx
 *.xlsm
+*.xlsx.inspect.ndjson
 .env
 .DS_Store
 

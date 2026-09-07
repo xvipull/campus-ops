@@ -53,6 +53,8 @@ Admissions / SIS / LMS / Finance / HR
 - [Assumptions and risks](docs/assumptions.md)
 - [Pipeline, controls, and star model](docs/data_pipeline.md)
 - [Resource-pressure scenarios](docs/advanced_analytics.md)
+- [Power BI decision product](powerbi/README.md)
+- [Excel decision companion](excel/README.md)
 
 ## Report screenshots
 

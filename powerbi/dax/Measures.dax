@@ -1,0 +1,48 @@
+// Create the Date table and mark Date[Date] as the model date table.
+Date =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2025, 1, 1 ), DATE ( 2027, 12, 31 ) ),
+    "Year", YEAR ( [Date] ),
+    "Month Number", MONTH ( [Date] ),
+    "Month", FORMAT ( [Date], "MMM" ),
+    "Year Month", FORMAT ( [Date], "YYYY-MM" ),
+    "Academic Year", "AY " & YEAR ( EDATE ( [Date], 7 ) )
+)
+
+Active Enrollment =
+CALCULATE ( DISTINCTCOUNT ( fact_enrollment[student_key] ), fact_enrollment[enrollment_status] = "Active" )
+
+Registered Credit Hours =
+CALCULATE ( SUM ( fact_enrollment[registered_credit_hours] ), fact_enrollment[enrollment_status] = "Active" )
+
+Withdrawn Students =
+CALCULATE ( DISTINCTCOUNT ( fact_enrollment[student_key] ), fact_enrollment[enrollment_status] = "Withdrawn" )
+
+Withdrawal Rate =
+DIVIDE ( [Withdrawn Students], [Active Enrollment] + [Withdrawn Students] )
+
+Available Seats = SUM ( fact_course_section[available_seats] )
+Enrolled Seats = SUM ( fact_course_section[enrolled_seats] )
+Course Fill Rate = DIVIDE ( [Enrolled Seats], [Available Seats] )
+
+Enrollment Forecast = SUM ( fact_plan[enrollment_forecast] )
+Enrollment Variance = [Active Enrollment] - [Enrollment Forecast]
+Enrollment Variance % = DIVIDE ( [Enrollment Variance], [Enrollment Forecast] )
+Instructional Capacity Gap = [Registered Credit Hours] - SUM ( fact_plan[available_sch_forecast] )
+
+Highest Resource Pressure = MAX ( vw_resource_pressure[composite_pressure_score] )
+Resource Pressure Rank = MIN ( vw_resource_pressure[pressure_rank] )
+Resource Pressure Target = 1.00
+Pressure Above Target = [Highest Resource Pressure] - [Resource Pressure Target]
+
+Quality Controls Passing =
+CALCULATE ( COUNTROWS ( vw_reconciliation ), vw_reconciliation[reconciliation_status] = "PASS" )
+
+Quality Controls Total = COUNTROWS ( vw_reconciliation )
+Quality Pass Rate = DIVIDE ( [Quality Controls Passing], [Quality Controls Total] )
+
+Prior Term Active Enrollment =
+CALCULATE ( [Active Enrollment], DATEADD ( 'Date'[Date], -1, QUARTER ) )
+
+Active Enrollment Change = [Active Enrollment] - [Prior Term Active Enrollment]
+Active Enrollment Change % = DIVIDE ( [Active Enrollment Change], [Prior Term Active Enrollment] )
